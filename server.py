@@ -1,3 +1,4 @@
+from textblob import TextBlob as tb
 from tweepy.streaming import StreamListener
 from twilio.rest import Client
 from flask import Flask
@@ -47,6 +48,19 @@ class TweetListener(StreamListener):
         if 'user' in data and data['user']['id_str'] in self.userIDs:
             call(self.phoneToCall, data)
 
+            xml = xmlFormat % (data['user']['name'], data['text'])
+            print(xml, "\n")
+            with open('tweet_%s.xml' % data['id'], 'w') as f:
+                f.write(xml)
+            # detect emotion
+            blob = tb(data['text'])
+            sent = blob.sentiment
+            polarity = sent.polarity  # the negativity or positivity of the tweet, on a -1 to 1 scale
+            if polarity > 0:
+                print('feeling positive! %s', polarity)
+            else:
+                print('feeling negative! %s', polarity)
+
 def follow(handles, phoneToCall):
     userIDs = [str(api.get_user(handle).id) for handle in handles]
     listener = TweetListener(userIDs, phoneToCall)
@@ -66,4 +80,4 @@ def receiveText():
     pass
 
 if __name__ == '__main__':
-    follow(['realDonaldTrump', 'BarackObama', 'TheEllenShow', 'heribberto'], '+16098656527')
+    follow(['realDonaldTrump', 'BarackObama', 'MBTA', 'TheEllenShow', 'heribberto'], 'Twinty5', '+16098656527')
