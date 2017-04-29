@@ -1,13 +1,14 @@
 # from textblob import TextBlob as tb
 from tweepy.streaming import StreamListener
 from twilio.rest import Client
+from boto.s3.key import Key
+import boto.s3
 import tweepy
 import json
 
-
 phoneFrom = '+16178588543'
 
-xmlFormat = '''
+xmlTemplate = '''
 <Response>
     <Say voice="alice">Tweet from %s: %s</Say>
 </Response>
@@ -16,6 +17,7 @@ xmlFormat = '''
 class TweetListener(StreamListener):
     def on_data(self, data):
         data = json.loads(data)
+        handleToNumbers = getUsersJson()
 
         if 'user' in data and data['user']['screen_name'] in handleToNumbers.keys():
             phonesToCall = handleToNumbers[data['user']['screen_name']]
@@ -33,13 +35,19 @@ class TweetListener(StreamListener):
             #     print('feeling negative! %s', polarity)
 
 def call(phoneTo, tweet):
-    xml = xmlFormat % (tweet['user']['name'], tweet['text'])
+    xml = xmlTemplate % (tweet['user']['name'], tweet['text'])
     print(xml)
-    with open('tweet_%s.xml' % tweet['id'], 'w') as f:
-        f.write(xml)
-    # TODO: upload xml to aws bucket
-    client.calls.create(to=phoneTo, from_=phoneFrom, url='https://s3.amazonaws.com/twinty/test.xml', 
-                                method='GET') # TODO: add url
+    k = Key(bucket)
+    k.key = 'tweet_%s.xml' % tweet['id']
+    k.set_contents_from_string(xml)
+    k.set_acl('public-read')
+    client.calls.create(to=phoneTo, from_=phoneFrom, method='GET',
+            url='https://s3.amazonaws.com/twinty/tweet_%s.xml' % tweet['id'])
+
+def getUsersJson():
+    with open('users.json') as f:
+        tmp = f.read()
+    return json.loads(tmp)
 
 
 if __name__ == '__main__':
@@ -53,9 +61,10 @@ if __name__ == '__main__':
 
     # twilio info
     client = Client(authInfo['twilio_acct_sid'], authInfo['twilio_auth_token'])
+    userIDs = [str(api.get_user(handle).id) for handle in getUsersJson().keys()]
 
-    with open('users.json') as f:
-        handleToNumbers = json.loads(f.read())
+    # aws info
+    conn = boto.connect_s3(authInfo['aws_access_key'], authInfo['aws_secret_key'])
+    bucket = conn.get_bucket('twinty')
 
-    userIDs = [str(api.get_user(handle).id) for handle in handleToNumbers.keys()]
     tweepy.Stream(auth, TweetListener()).filter(follow = userIDs)
