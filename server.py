@@ -1,4 +1,4 @@
-from textblob import TextBlob as tb
+# from textblob import TextBlob as tb
 from tweepy.streaming import StreamListener
 from twilio.rest import Client
 import tweepy
@@ -32,19 +32,14 @@ class TweetListener(StreamListener):
             # else:
             #     print('feeling negative! %s', polarity)
 
-def follow(handles, phoneToCall):
-    userIDs = [str(api.get_user(handle).id) for handle in handles]
-    listener = TweetListener(userIDs, phoneToCall)
-    stream = tweepy.Stream(auth, listener)
-    stream.filter(follow = userIDs)
-
 def call(phoneTo, tweet):
     xml = xmlFormat % (tweet['user']['name'], tweet['text'])
     print(xml)
     with open('tweet_%s.xml' % tweet['id'], 'w') as f:
         f.write(xml)
     # TODO: upload xml to aws bucket
-    client.calls.create(to=phoneTo, from_=phoneFrom, url='https://s3.amazonaws.com/twinty/test.xml') # TODO: add url
+    client.calls.create(to=phoneTo, from_=phoneFrom, url='https://s3.amazonaws.com/twinty/test.xml', 
+                                method='GET') # TODO: add url
 
 
 if __name__ == '__main__':
@@ -52,18 +47,12 @@ if __name__ == '__main__':
         authInfo = json.loads(f.read())
 
     # twitter info
-    apiKey = authInfo['twitter_api_key']
-    apiSecret = authInfo['twitter_api_secret']
-    accessToken = authInfo['twiter_access_token']
-    accessTokenSecret = authInfo['twitter_access_secret']
-    auth = tweepy.OAuthHandler(apiKey, apiSecret)
-    auth.set_access_token(accessToken, accessTokenSecret)
+    auth = tweepy.OAuthHandler(authInfo['twitter_api_key'], authInfo['twitter_api_secret'])
+    auth.set_access_token(authInfo['twiter_access_token'], authInfo['twitter_access_secret'])
     api = tweepy.API(auth)
 
     # twilio info
-    account_sid = authInfo['twilio_acct_sid']
-    auth_token = authInfo['9708b8d521dff44151d866bbd7b41498']
-    client = Client(account_sid, auth_token)
+    client = Client(authInfo['twilio_acct_sid'], authInfo['twilio_auth_token'])
 
     with open('users.json') as f:
         handleToNumbers = json.loads(f.read())
