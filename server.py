@@ -1,22 +1,9 @@
 from tweepy.streaming import StreamListener
 from twilio.rest import Client
-from flask import Flask
 import tweepy
 import json
 
-# twitter info
-apiKey = 'jwTBei3GYpKFKzHIpXNd9ebqn'
-apiSecret = '0oh3ElCt3zq14usCfx5zwWb6BtAufsPWzADHhmFS5fhg67WLPs'
-accessToken = '858396934394040320-6eFsVJLtuNI58i6XXTIAUP4s4ldsrlE'
-accessTokenSecret = 'Tnn314Jj1k7Co3Qqs0cCIlwnsPEhPW3I1wivYVyL0LZGm'
-auth = tweepy.OAuthHandler(apiKey, apiSecret)
-auth.set_access_token(accessToken, accessTokenSecret)
-api = tweepy.API(auth)
 
-# twilio info
-account_sid = "ACc4bd56b82a463f76094cf22dfcc0e7a3"
-auth_token = "01a0ecc27726f2f049d6d9318bcc7bfd"
-client = Client(account_sid, auth_token)
 phoneFrom = '+16178588543'
 
 xmlFormat = '''
@@ -25,45 +12,46 @@ xmlFormat = '''
 </Response>
 '''
 
-# twitter_handle -> [phone_number]
-users = {
-    'realDonaldTrump' : ['+16098656527'],
-    'BarackObama' : ['+16098656527'],
-    'TheEllenShow' : ['+16098656527'],
-    'heribberto' : ['+16098656527'],
-}
-
 class TweetListener(StreamListener):
-    userIDs = None
-    phoneToCall = None
-
-    def __init__(self, userIDs, phoneToCall):
-        self.userIDs = userIDs
-        self.phoneToCall = phoneToCall
-
     def on_data(self, data):
         data = json.loads(data)
 
-        if 'user' in data and data['user']['id_str'] in self.userIDs:
-            call(self.phoneToCall, data)
+        if 'user' in data and data['user']['screen_name'] in handleToNumbers.keys():
+            phonesToCall = handleToNumbers[data['user']['screen_name']]
+            
+            for phoneNum in phonesToCall:
+                call(phoneNum, data)
 
-def follow(handles, phoneToCall):
-    userIDs = [str(api.get_user(handle).id) for handle in handles]
-    listener = TweetListener(userIDs, phoneToCall)
-    stream = tweepy.Stream(auth, listener)
-    stream.filter(follow = userIDs)
 
 def call(phoneTo, tweet):
     xml = xmlFormat % (tweet['user']['name'], tweet['text'])
     print(xml)
     with open('tweet_%s.xml' % tweet['id'], 'w') as f:
         f.write(xml)
+    # TODO: upload xml to aws bucket
     client.calls.create(to=phoneTo, from_=phoneFrom, url='https://s3.amazonaws.com/twinty/test.xml') # TODO: add url
 
-@app.route('/receive_text')
-def receiveText():
-    # add to or remove from users
-    pass
 
 if __name__ == '__main__':
-    follow(['realDonaldTrump', 'BarackObama', 'TheEllenShow', 'heribberto'], '+16098656527')
+    with open('auth.json') as f:
+        authInfo = json.loads(f.read())
+
+    # twitter info
+    apiKey = authInfo['twitter_api_key']
+    apiSecret = authInfo['twitter_api_secret']
+    accessToken = authInfo['twiter_access_token']
+    accessTokenSecret = authInfo['twitter_access_secret']
+    auth = tweepy.OAuthHandler(apiKey, apiSecret)
+    auth.set_access_token(accessToken, accessTokenSecret)
+    api = tweepy.API(auth)
+
+    # twilio info
+    account_sid = authInfo['twilio_acct_sid']
+    auth_token = authInfo['9708b8d521dff44151d866bbd7b41498']
+    client = Client(account_sid, auth_token)
+
+    with open('users.json') as f:
+        handleToNumbers = json.loads(f.read())
+
+    userIDs = [str(api.get_user(handle).id) for handle in handleToNumbers.keys()]
+    tweepy.Stream(auth, TweetListener()).filter(follow = userIDs)
