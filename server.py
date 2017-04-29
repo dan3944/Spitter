@@ -80,4 +80,4 @@ def receiveText():
     pass
 
 if __name__ == '__main__':
-    follow(['realDonaldTrump', 'BarackObama', 'MBTA', 'TheEllenShow', 'heribberto'], 'Twinty5', '+16098656527')
+    follow(['realDonaldTrump', 'BarackObama', 'MBTA', 'TheEllenShow', 'heribberto', 'Twinty5'], '+16098656527')
