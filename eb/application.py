@@ -75,7 +75,7 @@ def downloadUsersJson():
     return json.loads(urlopen('https://s3.amazonaws.com/twinty/users.json').read().decode())
 
 def uploadUsersJson(jsonDict):
-    bucket = boto.connect_s3('AKIAJE253PUSJXRAJC2Q', 'IpfaDuGs+R7qztA7/HvLiFRfTsNdtQQGB4WhdtEN') \
+    bucket = boto.connect_s3('<redacted>', '<redacted>') \
                     .get_bucket('twinty')
 
     tmp = json.dumps(jsonDict)
@@ -94,7 +94,7 @@ if __name__ == '__main__':
     #     authInfo = json.loads(f.read())
     
     # client = Client(authInfo['twilio_acct_sid'], authInfo['twilio_auth_token'])
-    client = Client('AC0941a173f445c6837eda96d803bf31f6', '9708b8d521dff44151d866bbd7b41498')
+    client = Client('<redacted>', '<redacted>')
 
     # aws info
     # conn = boto.connect_s3(authInfo['aws_access_key'], authInfo['aws_secret_key'])
