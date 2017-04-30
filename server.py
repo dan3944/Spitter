@@ -52,6 +52,24 @@ def getUsersJson():
     return json.loads(urlopen('https://s3.amazonaws.com/twinty/users.json').read().decode())
 
 
+def listen(auth, stream, userIDs, api):
+    try:
+        stream = tweepy.Stream(auth, TweetListener())
+        stream.filter(follow = userIDs, async = True)
+
+        while True:
+            time.sleep(5)
+            newUserIDs = set(str(api.get_user(handle).id) for handle in getUsersJson().keys())
+
+            if newUserIDs != userIDs:
+                stream.disconnect()
+                stream.filter(follow = newUserIDs, async = True)
+
+    except Exception:
+        print(str(e))
+        listen(auth, stream, userIDs, api)
+
+
 if __name__ == '__main__':
     with open('auth.json') as f:
         authInfo = json.loads(f.read())
@@ -69,13 +87,14 @@ if __name__ == '__main__':
     conn = boto.connect_s3(authInfo['aws_access_key'], authInfo['aws_secret_key'])
     bucket = conn.get_bucket('twinty')
 
-    stream = tweepy.Stream(auth, TweetListener())
-    stream.filter(follow = userIDs, async = True)
+    listen(auth, stream, userIDs, api)
+    # stream = tweepy.Stream(auth, TweetListener())
+    # stream.filter(follow = userIDs, async = True)
 
-    while True:
-        time.sleep(5)
-        newUserIDs = set(str(api.get_user(handle).id) for handle in getUsersJson().keys())
+    # while True:
+    #     time.sleep(5)
+    #     newUserIDs = set(str(api.get_user(handle).id) for handle in getUsersJson().keys())
 
-        if newUserIDs != userIDs:
-            stream.disconnect()
-            stream.filter(follow = newUserIDs, async = True)
+    #     if newUserIDs != userIDs:
+    #         stream.disconnect()
+    #         stream.filter(follow = newUserIDs, async = True)
