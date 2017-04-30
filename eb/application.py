@@ -47,7 +47,7 @@ def receiveText():
             phones.remove(fromNumber)
 
         handleToPhones[handle] = phones
-        uploadUsersJson(json.dumps(handleToPhones))
+        uploadUsersJson(handleToPhones)
 
         return str(MessagingResponse().message("test"))
         return str(MessagingResponse().message("You have %s %s" % (action, handle)))
