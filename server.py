@@ -87,7 +87,10 @@ if __name__ == '__main__':
 
     # twilio info
     client = Client(authInfo['twilio_acct_sid'], authInfo['twilio_auth_token'])
-    userIDs = set(str(api.get_user(handle).id) for handle in getUsersJson().keys())
+    # userIDs = set(str(api.get_user(handle).id) for handle in getUsersJson().keys())
+    userIDs = set(str(user.id) for user in api.lookup_users(screen_names = getUsersJson().keys()))
+    # print(userIDs)
+    # raise SystemExit
 
     # aws info
     conn = boto.connect_s3(authInfo['aws_access_key'], authInfo['aws_secret_key'])
@@ -98,7 +101,8 @@ if __name__ == '__main__':
 
     while True:
         time.sleep(5)
-        newUserIDs = set(str(api.get_user(handle).id) for handle in getUsersJson().keys())
+        # newUserIDs = set(str(api.get_user(handle).id) for handle in getUsersJson().keys())
+        newUserIDs = set(str(user.id) for user in api.lookup_users(screen_names = getUsersJson().keys()))
 
         # if someone has followed someone new who no one has followed before
         if newUserIDs != userIDs:
