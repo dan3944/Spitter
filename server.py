@@ -44,7 +44,7 @@ class TweetListener(StreamListener):
             voice = 'alice' if polarity > 0 else 'man'
 
             for phoneNum in phonesToCall:
-                call(phoneNum, data, voice)
+                self.call(phoneNum, data, voice)
 
     def call(self, phoneTo, tweet, voice):
         xml = xmlTemplate % (voice, tweet['user']['name'], tweet['text'])
@@ -69,7 +69,7 @@ def listenWithExceptionHandler(auth, userIDs, bucket, client):
         return
     except Exception as e:
         print(str(e))
-        listenWithExceptionHandler(auth, userIDs, api, bucket, client)
+        listenWithExceptionHandler(auth, userIDs, bucket, client)
 
 
 if __name__ == '__main__':
