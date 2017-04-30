@@ -30,7 +30,7 @@ def receiveText():
                 'Your message must include both an action and a twitter handle.'))
 
         action = words[0].upper()
-        handle = words[1]
+        handle = words[1].upper()
 
         if action not in ('FOLLOW', 'UNFOLLOW'):
             return str(MessagingResponse().message(
@@ -46,11 +46,14 @@ def receiveText():
         elif action == 'UNFOLLOW' and fromNumber in phones:
             phones.remove(fromNumber)
 
-        handleToPhones[handle] = phones
+        if phones:
+            handleToPhones[handle] = phones
+        else:
+            del handleToPhones[handle]
+
         uploadUsersJson(handleToPhones)
 
-        return str(MessagingResponse().message("test"))
-        return str(MessagingResponse().message("You have %s %s" % (action, handle)))
+        return str(MessagingResponse().message("You have %sed %s" % (action.lower(), handle)))
     except Exception as e:
         return str(MessagingResponse().message(str(e)))
 
