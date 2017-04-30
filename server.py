@@ -1,16 +1,18 @@
 from textblob import TextBlob as tb
 from tweepy.streaming import StreamListener
 from twilio.rest import Client
+from urllib.request import urlopen
 from boto.s3.key import Key
 import boto.s3
 import tweepy
 import json
+import time
 
 phoneFrom = '+16178588543'
 
 xmlTemplate = '''
 <Response>
-    <Say voice="%s">Tweet from %s and %s is feeling %s saying: %s</Say>
+    <Say voice="%s">Tweet from %s: %s</Say>
 </Response>
 '''
 
@@ -19,26 +21,24 @@ class TweetListener(StreamListener):
         data = json.loads(data)
         handleToNumbers = getUsersJson()
 
-        if 'user' in data and data['user']['screen_name'] in handleToNumbers.keys():
+        if 'user' not in data:
+            return
+
+        data['user']['screen_name'] = data['user']['screen_name'].upper()
+
+        if data['user']['screen_name'] in handleToNumbers.keys():
             phonesToCall = handleToNumbers[data['user']['screen_name']]
 
             # detect emotion
             blob = tb(data['text'])
-            sent = blob.sentiment
-            polarity = sent.polarity  # the negativity or positivity of the tweet, on a -1 to 1 scale
-            if polarity > 0:
-                voice = 'alice'
-                mood = 'super happy and laughing while '
-                for phoneNum in phonesToCall:
-                    call(voice, phoneNum, data, mood)
-            else:
-                voice = 'man'
-                mood = 'freaking angry'
-                for phoneNum in phonesToCall:
-                    call(voice, phoneNum, data, mood)
+            polarity = blob.sentiment.polarity  # the negativity or positivity of the tweet, on a -1 to 1 scale
+            voice = 'alice' if polarity > 0 else 'man'
 
-def call(voice, phoneTo, tweet, mood):
-    xml = xmlTemplate % (voice, tweet['user']['name'], tweet['user']['name'], mood, tweet['text'])
+            for phoneNum in phonesToCall:
+                call(phoneNum, data, voice)
+
+def call(phoneTo, tweet, voice):
+    xml = xmlTemplate % (voice, tweet['user']['name'], tweet['text'])
     print(xml)
     k = Key(bucket)
     k.key = 'tweet_%s.xml' % tweet['id']
@@ -49,9 +49,7 @@ def call(voice, phoneTo, tweet, mood):
             url='https://s3.amazonaws.com/twinty/tweet_%s.xml' % tweet['id'])
 
 def getUsersJson():
-    with open('users.json') as f:
-        tmp = f.read()
-    return json.loads(tmp)
+    return json.loads(urlopen('https://s3.amazonaws.com/twinty/users.json').read().decode())
 
 
 if __name__ == '__main__':
@@ -65,10 +63,19 @@ if __name__ == '__main__':
 
     # twilio info
     client = Client(authInfo['twilio_acct_sid'], authInfo['twilio_auth_token'])
-    userIDs = [str(api.get_user(handle).id) for handle in getUsersJson().keys()]
+    userIDs = set(str(api.get_user(handle).id) for handle in getUsersJson().keys())
 
     # aws info
     conn = boto.connect_s3(authInfo['aws_access_key'], authInfo['aws_secret_key'])
     bucket = conn.get_bucket('twinty')
 
-    tweepy.Stream(auth, TweetListener()).filter(follow = userIDs)
+    stream = tweepy.Stream(auth, TweetListener())
+    stream.filter(follow = userIDs, async = True)
+
+    while True:
+        time.sleep(5)
+        newUserIDs = set(str(api.get_user(handle).id) for handle in getUsersJson().keys())
+
+        if newUserIDs != userIDs:
+            stream.disconnect()
+            stream.filter(follow = newUserIDs, async = True)
