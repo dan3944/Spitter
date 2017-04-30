@@ -4,14 +4,14 @@ from twilio.twiml.messaging_response import MessagingResponse
 import json
 import tweepy
 
-app = Flask(__name__)
+application = Flask(__name__)
 
-@app.route('/test', methods=['GET', 'POST'])
+@application.route('/test', methods=['GET', 'POST'])
 def test():
     return 'test'
 
 
-@app.route('/receive_text', methods=['GET', 'POST'])
+@application.route('/receive_text', methods=['GET', 'POST'])
 def receiveText():
     fromNumber = request.values.get('From')
     msgText = request.values.get('Body')
@@ -69,10 +69,11 @@ def handleExists(handle):
 
 
 if __name__ == '__main__':
-    with open('auth.json') as f:
-        authInfo = json.loads(f.read())
+    # with open('auth.json') as f:
+    #     authInfo = json.loads(f.read())
     
-    client = Client(authInfo['twilio_acct_sid'], authInfo['twilio_auth_token'])
+    # client = Client(authInfo['twilio_acct_sid'], authInfo['twilio_auth_token'])
+    client = Client('AC0941a173f445c6837eda96d803bf31f6', '9708b8d521dff44151d866bbd7b41498')
 
-    app.debug = True
-    app.run()
+    application.debug = True
+    application.run()
