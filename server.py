@@ -3,6 +3,7 @@ from tweepy.streaming import StreamListener
 from twilio.rest import Client
 from urllib.request import urlopen
 from boto.s3.key import Key
+from http.client import IncompleteRead
 import boto.s3
 import tweepy
 import json
@@ -66,6 +67,11 @@ def listen(auth, userIDs, api):
                 stream.disconnect()
                 stream.filter(follow = newUserIDs, async = True)
 
+    except IncompleteRead:
+        print("IncompleteRead. Continuing.")
+        listen(auth, userIDs, api)
+    except KeyboardInterrupt:
+        stream.disconnect()
     except Exception:
         print(str(e))
         listen(auth, userIDs, api)
