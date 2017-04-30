@@ -5,7 +5,6 @@ from boto.s3.key import Key
 import boto.s3
 import tweepy
 import json
-import time
 
 phoneFrom = '+16178588543'
 
@@ -69,4 +68,4 @@ if __name__ == '__main__':
     conn = boto.connect_s3(authInfo['aws_access_key'], authInfo['aws_secret_key'])
     bucket = conn.get_bucket('twinty')
 
-    tweepy.Stream(auth, TweetListener()).filter(follow = userIDs).filter(follow = userIDs)
+    tweepy.Stream(auth, TweetListener()).filter(follow = userIDs)
