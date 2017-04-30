@@ -75,7 +75,8 @@ def downloadUsersJson():
     return json.loads(urlopen('https://s3.amazonaws.com/twinty/users.json').read().decode())
 
 def uploadUsersJson(jsonDict):
-    bucket = boto.connect_s3('AKIAIWSDS2KRBFRPN2RA', 'ZBoOGV/P2pRvmm8d6WzbFgRCjDTP0F6NFhAJf+cV').get_bucket('twinty')
+    bucket = boto.connect_s3('AKIAJE253PUSJXRAJC2Q', 'IpfaDuGs+R7qztA7/HvLiFRfTsNdtQQGB4WhdtEN') \
+                    .get_bucket('twinty')
 
     tmp = json.dumps(jsonDict)
     kOld = Key(bucket)
