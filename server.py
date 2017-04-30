@@ -54,6 +54,7 @@ def getUsersJson():
 
 def listen(auth, userIDs, api):
     try:
+        print("Starting Twitter listener.")
         stream = tweepy.Stream(auth, TweetListener())
         stream.filter(follow = userIDs, async = True)
 
