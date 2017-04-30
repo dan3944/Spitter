@@ -83,14 +83,15 @@ def uploadUsersJson(jsonDict):
 
 
 if __name__ == '__main__':
-    with open('auth.json') as f:
-        authInfo = json.loads(f.read())
+    # with open('auth.json') as f:
+    #     authInfo = json.loads(f.read())
     
-    client = Client(authInfo['twilio_acct_sid'], authInfo['twilio_auth_token'])
-    # client = Client('AC0941a173f445c6837eda96d803bf31f6', '9708b8d521dff44151d866bbd7b41498')
+    # client = Client(authInfo['twilio_acct_sid'], authInfo['twilio_auth_token'])
+    client = Client('AC0941a173f445c6837eda96d803bf31f6', '9708b8d521dff44151d866bbd7b41498')
 
     # aws info
-    conn = boto.connect_s3(authInfo['aws_access_key'], authInfo['aws_secret_key'])
+    # conn = boto.connect_s3(authInfo['aws_access_key'], authInfo['aws_secret_key'])
+    conn = boto.connect_s3('AKIAIWSDS2KRBFRPN2RA', 'ZBoOGV/P2pRvmm8d6WzbFgRCjDTP0F6NFhAJf+cV')
     bucket = conn.get_bucket('twinty')
 
     application.debug = True
