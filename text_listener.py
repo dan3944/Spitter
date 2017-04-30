@@ -1,5 +1,5 @@
 from flask import Flask
-from twilio.rest import client
+from twilio.rest import Client
 import json
 import tweepy
 
@@ -19,7 +19,7 @@ def receiveText():
 
     if action not in ('FOLLOW', 'UNFOLLOW'):
         send(fromNumber, 'Your action must be either "Follow" or "Unfollow". Your action was "%s".' % action)
-    elif not handleExists(handle)
+    elif not handleExists(handle):
         send(fromNumber, 'Could not find the twitter handle "%s"' % handle)
 
     with open('users.json') as f:

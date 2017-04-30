@@ -28,7 +28,7 @@ class TweetListener(StreamListener):
             polarity = sent.polarity  # the negativity or positivity of the tweet, on a -1 to 1 scale
             if polarity > 0:
                 voice = 'alice'
-                mood = 'super happpy and laughing while '
+                mood = 'super happy and laughing while '
                 for phoneNum in phonesToCall:
                     call(voice, phoneNum, data, mood)
             else:
