@@ -53,30 +53,6 @@ def getUsersJson():
     return json.loads(urlopen('https://s3.amazonaws.com/twinty/users.json').read().decode())
 
 
-def listen(auth, userIDs, api):
-    try:
-        print("Starting Twitter listener.")
-        stream = tweepy.Stream(auth, TweetListener())
-        stream.filter(follow = userIDs, async = True)
-
-        while True:
-            time.sleep(5)
-            newUserIDs = set(str(api.get_user(handle).id) for handle in getUsersJson().keys())
-
-            if newUserIDs != userIDs:
-                stream.disconnect()
-                stream.filter(follow = newUserIDs, async = True)
-
-    except IncompleteRead:
-        print("IncompleteRead. Continuing.")
-        listen(auth, userIDs, api)
-    except KeyboardInterrupt:
-        stream.disconnect()
-    except Exception:
-        print(str(e))
-        listen(auth, userIDs, api)
-
-
 if __name__ == '__main__':
     with open('auth.json') as f:
         authInfo = json.loads(f.read())
@@ -94,8 +70,6 @@ if __name__ == '__main__':
     conn = boto.connect_s3(authInfo['aws_access_key'], authInfo['aws_secret_key'])
     bucket = conn.get_bucket('twinty')
 
-
-
     while True:
         try:
             print("Starting Twitter listener.")
@@ -109,7 +83,8 @@ if __name__ == '__main__':
                 if newUserIDs != userIDs:
                     stream.disconnect()
                     stream.filter(follow = newUserIDs, async = True)
+
         except KeyboardInterrupt:
-            raise SystemExit
+            break
         except:
-            continue
+            stream.disconnect()
