@@ -1,4 +1,4 @@
-# from textblob import TextBlob as tb
+from textblob import TextBlob as tb
 from tweepy.streaming import StreamListener
 from twilio.rest import Client
 from boto.s3.key import Key
@@ -10,7 +10,7 @@ phoneFrom = '+16178588543'
 
 xmlTemplate = '''
 <Response>
-    <Say voice="alice">Tweet from %s: %s</Say>
+    <Say voice="%s">Tweet from %s and %s is feeling %s saying: %s</Say>
 </Response>
 '''
 
@@ -21,21 +21,24 @@ class TweetListener(StreamListener):
 
         if 'user' in data and data['user']['screen_name'] in handleToNumbers.keys():
             phonesToCall = handleToNumbers[data['user']['screen_name']]
-            
-            for phoneNum in phonesToCall:
-                call(phoneNum, data)
 
-            # # detect emotion
-            # blob = tb(data['text'])
-            # sent = blob.sentiment
-            # polarity = sent.polarity  # the negativity or positivity of the tweet, on a -1 to 1 scale
-            # if polarity > 0:
-            #     print('feeling positive! %s', polarity)
-            # else:
-            #     print('feeling negative! %s', polarity)
+            # detect emotion
+            blob = tb(data['text'])
+            sent = blob.sentiment
+            polarity = sent.polarity  # the negativity or positivity of the tweet, on a -1 to 1 scale
+            if polarity > 0:
+                voice = 'alice'
+                mood = 'super happpy and laughing while '
+                for phoneNum in phonesToCall:
+                    call(voice, phoneNum, data, mood)
+            else:
+                voice = 'man'
+                mood = 'freaking angry'
+                for phoneNum in phonesToCall:
+                    call(voice, phoneNum, data, mood)
 
-def call(phoneTo, tweet):
-    xml = xmlTemplate % (tweet['user']['name'], tweet['text'])
+def call(voice, phoneTo, tweet, mood):
+    xml = xmlTemplate % (voice, tweet['user']['name'], tweet['user']['name'], mood, tweet['text'])
     print(xml)
     k = Key(bucket)
     k.key = 'tweet_%s.xml' % tweet['id']
