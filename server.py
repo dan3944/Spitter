@@ -5,6 +5,7 @@ from boto.s3.key import Key
 import boto.s3
 import tweepy
 import json
+import time
 
 phoneFrom = '+16178588543'
 
@@ -39,6 +40,7 @@ def call(phoneTo, tweet):
     print(xml)
     k = Key(bucket)
     k.key = 'tweet_%s.xml' % tweet['id']
+    k.content_type = 'text/xml'
     k.set_contents_from_string(xml)
     k.set_acl('public-read')
     client.calls.create(to=phoneTo, from_=phoneFrom, method='GET',
@@ -67,4 +69,4 @@ if __name__ == '__main__':
     conn = boto.connect_s3(authInfo['aws_access_key'], authInfo['aws_secret_key'])
     bucket = conn.get_bucket('twinty')
 
-    tweepy.Stream(auth, TweetListener()).filter(follow = userIDs)
+    tweepy.Stream(auth, TweetListener()).filter(follow = userIDs).filter(follow = userIDs)
