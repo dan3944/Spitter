@@ -39,6 +39,7 @@ def call(phoneTo, tweet):
     print(xml)
     k = Key(bucket)
     k.key = 'tweet_%s.xml' % tweet['id']
+    k.content_type = 'text/xml'
     k.set_contents_from_string(xml)
     k.set_acl('public-read')
     client.calls.create(to=phoneTo, from_=phoneFrom, method='GET',
