@@ -94,14 +94,22 @@ if __name__ == '__main__':
     conn = boto.connect_s3(authInfo['aws_access_key'], authInfo['aws_secret_key'])
     bucket = conn.get_bucket('twinty')
 
-    listen(auth, userIDs, api)
-    # stream = tweepy.Stream(auth, TweetListener())
-    # stream.filter(follow = userIDs, async = True)
 
-    # while True:
-    #     time.sleep(5)
-    #     newUserIDs = set(str(api.get_user(handle).id) for handle in getUsersJson().keys())
 
-    #     if newUserIDs != userIDs:
-    #         stream.disconnect()
-    #         stream.filter(follow = newUserIDs, async = True)
+    while True:
+        try:
+            print("Starting Twitter listener.")
+            stream = tweepy.Stream(auth, TweetListener())
+            stream.filter(follow = userIDs, async = True)
+
+            while True:
+                time.sleep(5)
+                newUserIDs = set(str(api.get_user(handle).id) for handle in getUsersJson().keys())
+
+                if newUserIDs != userIDs:
+                    stream.disconnect()
+                    stream.filter(follow = newUserIDs, async = True)
+        except KeyboardInterrupt:
+            raise SystemExit
+        except:
+            continue
