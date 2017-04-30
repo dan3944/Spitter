@@ -3,11 +3,11 @@ from tweepy.streaming import StreamListener
 from twilio.rest import Client
 from urllib.request import urlopen
 from boto.s3.key import Key
-from http.client import IncompleteRead
 import boto.s3
 import tweepy
 import json
 import time
+import multiprocessing
 
 phoneFrom = '+16178588543'
 
@@ -53,6 +53,17 @@ def getUsersJson():
     return json.loads(urlopen('https://s3.amazonaws.com/twinty/users.json').read().decode())
 
 
+def listenWithExceptionHandler(auth, userIDs):
+    print("Starting Twitter listener.")
+    try:
+        tweepy.Stream(auth, TweetListener()).filter(follow = userIDs)
+    except KeyboardInterrupt:
+        return
+    except Exception as e:
+        print(str(e))
+        listenWithExceptionHandler(auth, userIDs, api)
+
+
 if __name__ == '__main__':
     with open('auth.json') as f:
         authInfo = json.loads(f.read())
@@ -70,21 +81,15 @@ if __name__ == '__main__':
     conn = boto.connect_s3(authInfo['aws_access_key'], authInfo['aws_secret_key'])
     bucket = conn.get_bucket('twinty')
 
+    process = multiprocessing.Process(target=listenWithExceptionHandler, args=(auth, userIDs))
+    process.start()
+
     while True:
-        try:
-            print("Starting Twitter listener.")
-            stream = tweepy.Stream(auth, TweetListener())
-            stream.filter(follow = userIDs, async = True)
+        time.sleep(5)
+        newUserIDs = set(str(api.get_user(handle).id) for handle in getUsersJson().keys())
 
-            while True:
-                time.sleep(5)
-                newUserIDs = set(str(api.get_user(handle).id) for handle in getUsersJson().keys())
-
-                if newUserIDs != userIDs:
-                    stream.disconnect()
-                    stream.filter(follow = newUserIDs, async = True)
-
-        except KeyboardInterrupt:
-            break
-        except:
-            stream.disconnect()
+        if newUserIDs != userIDs:
+            userIDs = newUserIDs
+            process.terminate()
+            process = multiprocessing.Process(target=listenWithExceptionHandler, args=(auth, userIDs))
+            process.start()
