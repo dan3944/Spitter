@@ -42,13 +42,14 @@ def receiveText():
         phones = handleToPhones.get(handle, [])
 
         if action == 'FOLLOW' and fromNumber not in phones:
-            phones.add(fromNumber)
+            phones.append(fromNumber)
         elif action == 'UNFOLLOW' and fromNumber in phones:
             phones.remove(fromNumber)
 
         handleToPhones[handle] = phones
         uploadUsersJson(json.dumps(handleToPhones))
 
+        return str(MessagingResponse().message("test"))
         return str(MessagingResponse().message("You have %s %s" % (action, handle)))
     except Exception as e:
         return str(MessagingResponse().message(str(e)))
