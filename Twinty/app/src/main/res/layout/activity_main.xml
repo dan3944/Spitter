@@ -13,98 +13,99 @@
     <LinearLayout
         android:layout_width="match_parent"
         android:layout_height="wrap_content"
-        android:orientation="vertical"
-        android:gravity="center">
+        android:gravity="center"
+        android:orientation="vertical">
 
-    <ImageView
-        android:id="@+id/imageView"
-        android:layout_width="175dp"
-        android:layout_height="175dp"
-        app:srcCompat="@drawable/spitterspiticonv2"
-        android:adjustViewBounds="true"
-        android:layout_gravity="center"
-        android:layout_marginBottom="20dp"/>
-
-    <LinearLayout
-        android:layout_width="match_parent"
-        android:layout_height="wrap_content"
-        android:orientation="vertical"
-        android:layout_marginLeft="80dp"
-        android:layout_marginRight="80dp">
-
-        <TextView
-            android:layout_width="match_parent"
-            android:layout_height="wrap_content"
-            android:text="Enter Your Phone Number"
-            android:gravity="center"
-            android:textSize="20sp"
-            android:textColor="#000000"/>
-
-        <EditText
-            android:id="@+id/editText"
-            android:layout_width="match_parent"
-            android:layout_height="wrap_content"
+        <ImageView
+            android:id="@+id/imageView"
+            android:layout_width="175dp"
+            android:layout_height="175dp"
+            android:layout_gravity="center"
             android:layout_marginBottom="20dp"
-            android:layout_marginTop="10dp"
-            android:background="@drawable/boxy"
-            android:ems="10"
-            android:gravity="center"
-            android:inputType="phone"
-            android:paddingBottom="4dp"
-            android:paddingTop="4dp"
-            android:textSize="24sp"
-            android:maxLength="14"
-            android:hint="(617)-922-4633"/>
-
-        <TextView
-            android:layout_width="match_parent"
-            android:layout_height="wrap_content"
-            android:text="Enter a Twitter Handle"
-            android:gravity="center"
-            android:textSize="20sp"
-            android:textColor="#000000"/>
-
-        <EditText
-            android:id="@+id/editText2"
-            android:layout_width="match_parent"
-            android:layout_height="wrap_content"
-            android:ems="10"
-            android:gravity="center"
-            android:background="@drawable/boxy"
-            android:inputType="textPersonName"
-            android:textSize="24sp"
-            android:layout_marginBottom="30dp"
-            android:layout_marginTop="10dp"
-            android:paddingTop="4dp"
-            android:paddingBottom="4dp"
-            android:hint="\@heribberto"/>
+            android:adjustViewBounds="true"
+            app:srcCompat="@drawable/spitterspiticonv2" />
 
         <LinearLayout
             android:layout_width="match_parent"
-            android:layout_height="match_parent"
-            android:gravity="center">
+            android:layout_height="wrap_content"
+            android:layout_marginLeft="80dp"
+            android:layout_marginRight="80dp"
+            android:orientation="vertical">
+
+            <TextView
+                android:layout_width="match_parent"
+                android:layout_height="wrap_content"
+                android:gravity="center"
+                android:text="Enter Your Phone Number"
+                android:textColor="#000000"
+                android:textSize="20sp" />
+
+            <EditText
+                android:id="@+id/editText"
+                android:layout_width="match_parent"
+                android:layout_height="wrap_content"
+                android:layout_marginBottom="20dp"
+                android:layout_marginTop="10dp"
+                android:background="@drawable/boxy"
+                android:ems="10"
+                android:gravity="center"
+                android:hint="(617)-922-4633"
+                android:inputType="phone"
+                android:maxLength="14"
+                android:paddingBottom="4dp"
+                android:paddingTop="4dp"
+                android:textSize="24sp" />
+
+            <TextView
+                android:layout_width="match_parent"
+                android:layout_height="wrap_content"
+                android:gravity="center"
+                android:text="Enter a Twitter Handle"
+                android:textColor="#000000"
+                android:textSize="20sp" />
+
+            <EditText
+                android:id="@+id/editText2"
+                android:layout_width="match_parent"
+                android:layout_height="wrap_content"
+                android:layout_marginBottom="30dp"
+                android:layout_marginTop="10dp"
+                android:background="@drawable/boxy"
+                android:ems="10"
+                android:gravity="center"
+                android:hint="\@heribberto"
+                android:inputType="textPersonName"
+                android:paddingBottom="4dp"
+                android:paddingTop="4dp"
+                android:textSize="24sp" />
+
             <LinearLayout
-                android:layout_width="wrap_content"
-                android:layout_height="wrap_content">
+                android:layout_width="match_parent"
+                android:layout_height="match_parent"
+                android:gravity="center">
 
-                <Button
-                    android:id="@+id/button"
-                    android:layout_width="100dp"
-                    android:layout_height="wrap_content"
-                    android:text="Follow"
-                    android:layout_marginRight="20dp"
-                    android:background="@drawable/buttonbox"
-                    android:textAllCaps="false"/>
+                <LinearLayout
+                    android:layout_width="wrap_content"
+                    android:layout_height="wrap_content">
 
-                <Button
-                    android:id="@+id/button2"
-                    android:layout_width="100dp"
-                    android:layout_height="wrap_content"
-                    android:text="Unfollow"
-                    android:background="@drawable/buttonbox"
-                    android:textAllCaps="false"/>
+                    <Button
+                        android:id="@+id/button"
+                        android:layout_width="100dp"
+                        android:layout_height="wrap_content"
+                        android:layout_marginRight="20dp"
+                        android:background="@drawable/buttonbox"
+                        android:text="Follow"
+                        android:textAllCaps="false" />
+
+                    <Button
+                        android:id="@+id/button2"
+                        android:layout_width="100dp"
+                        android:layout_height="wrap_content"
+                        android:background="@drawable/buttonbox"
+                        android:text="Unfollow"
+                        android:textAllCaps="false" />
+                </LinearLayout>
             </LinearLayout>
-        </LinearLayout>
         </LinearLayout>
     </LinearLayout>
 </LinearLayout>
