@@ -1,8 +1,8 @@
 from flask import Flask, request
 from twilio.rest import Client
 from twilio.twiml.messaging_response import MessagingResponse
-from boto.s3.key import Key
 from urllib.request import urlopen
+from boto.s3.key import Key
 import boto.s3
 import json
 import tweepy
@@ -72,14 +72,13 @@ def downloadUsersJson():
     return json.loads(urlopen('https://s3.amazonaws.com/twinty/users.json').read().decode())
 
 def uploadUsersJson(jsonDict):
-    conn = boto.connect_s3('AKIAIWSDS2KRBFRPN2RA', 'ZBoOGV/P2pRvmm8d6WzbFgRCjDTP0F6NFhAJf+cV')
-    bucket = conn.get_bucket('twinty')
+    bucket = boto.connect_s3('AKIAIWSDS2KRBFRPN2RA', 'ZBoOGV/P2pRvmm8d6WzbFgRCjDTP0F6NFhAJf+cV').get_bucket('twinty')
 
     tmp = json.dumps(jsonDict)
     kOld = Key(bucket)
     kNew = Key(bucket)
     kOld.key = 'users.json'
-    bucket.delete(kOld)
+    bucket.delete_key(kOld)
     kNew.key = 'users.json'
     kNew.content_type = 'application/json'
     kNew.set_contents_from_string(tmp)
