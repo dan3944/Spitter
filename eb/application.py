@@ -78,7 +78,7 @@ def uploadUsersJson(jsonDict):
     kOld = Key(bucket)
     kNew = Key(bucket)
     kOld.key = 'users.json'
-    bucket.delete(k)
+    bucket.delete(kOld)
     kNew.key = 'users.json'
     kNew.content_type = 'application/json'
     kNew.set_contents_from_string(tmp)
