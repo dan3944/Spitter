@@ -1,27 +1,33 @@
-from flask import Flask
+from flask import Flask, request
+from twilio import twiml
 from twilio.rest import Client
 import json
 import tweepy
 
 app = Flask(__name__)
 
-@app.route('/receive_text')
+@app.route('/receive_text', methods=['GET', 'POST'])
 def receiveText():
-    fromNumber = ???
-    msgText = ???
+    print("in receiveText\n")
+    fromNumber = request.form['From']
+    msgText = request.form['Body']
     words = msgText.split()
-    
+    print("recevied a message\n")
     if len(words) < 2:
-        send(fromNumber, 'Your message must include both an action and a twitter handle.')
+        # send(fromNumber, 'Your message must include both an action and a twitter handle.')
+        return "Your message must include both an action and a twitter handle."
 
     action = words[0].upper()
     handle = words[1]
 
     if action not in ('FOLLOW', 'UNFOLLOW'):
-        send(fromNumber, 'Your action must be either "Follow" or "Unfollow". Your action was "%s".' % action)
+        # send(fromNumber, 'Your action must be either "Follow" or "Unfollow". Your action was "%s".' % action)
+        return "Your action must be either 'Follow' or 'Unfollow'. Your action was '%s'." % action
     elif not handleExists(handle):
-        send(fromNumber, 'Could not find the twitter handle "%s"' % handle)
+        # send(fromNumber, 'Could not find the twitter handle "%s"' % handle)
+        return "Could not find the twitter handle '%s'" % handle
 
+    print("trying to open user.json\n")
     with open('users.json') as f:
         tmp = f.read()
     handleToPhones = json.loads(tmp)
@@ -39,7 +45,8 @@ def receiveText():
     with open('users.json', 'w') as f:
         f.write(tmp)
 
-    send(fromNumber, "You have %s %s" % (action, handle))
+    # send(fromNumber, "You have %s %s" % (action, handle))
+    return "You have %s %s" % (action, handle)
 
 def handleExists(handle):
     with open('auth.json') as f:
@@ -62,9 +69,9 @@ def send(phoneNumber, text):
 if __name__ == '__main__':
     with open('auth.json') as f:
         authInfo = json.loads(f.read())
-    
     # twilio info
     client = Client(authInfo['twilio_acct_sid'], authInfo['twilio_auth_token'])
-    userIDs = [str(api.get_user(handle).id) for handle in getUsersJson().keys()]
+    print "going to call app.run\n"
+    # userIDs = [str(api.get_user(handle).id) for handle in getUsersJson().keys()]
 
-    app.run()
+    app.run(debug=True)
