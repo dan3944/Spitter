@@ -67,7 +67,7 @@ def listen(auth, userIDs, api):
 
     except Exception:
         print(str(e))
-        listen(auth, stream, userIDs, api)
+        listen(auth, userIDs, api)
 
 
 if __name__ == '__main__':
