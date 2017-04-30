@@ -81,8 +81,8 @@ def uploadUsersJson(jsonDict):
     bucket.delete(k)
     kNew.key = 'users.json'
     kNew.content_type = 'application/json'
-    k.set_contents_from_string(tmp)
-    k.set_acl('public-read')
+    kNew.set_contents_from_string(tmp)
+    kNew.set_acl('public-read')
 
 
 if __name__ == '__main__':
