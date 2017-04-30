@@ -27,8 +27,6 @@ class TweetListener(StreamListener):
     def __init__(self, bucket, client):
         self.bucket = bucket
         self.client = client
-        self.usersJson = getUsersJson()
-        self.lastUpdatedUsers = time.time()
 
     def on_data(self, data):
         data = json.loads(data)
