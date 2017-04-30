@@ -7,7 +7,23 @@
     android:layout_height="match_parent"
     android:orientation="vertical"
     android:background="#638ADF"
+    android:gravity="center"
     tools:context="com.example.samort7.androidtwinty.MainActivity">
+
+    <LinearLayout
+        android:layout_width="match_parent"
+        android:layout_height="wrap_content"
+        android:orientation="vertical"
+        android:gravity="center">
+
+    <ImageView
+        android:id="@+id/imageView"
+        android:layout_width="175dp"
+        android:layout_height="175dp"
+        app:srcCompat="@drawable/spitterspiticonv2"
+        android:adjustViewBounds="true"
+        android:layout_gravity="center"
+        android:layout_marginBottom="20dp"/>
 
     <LinearLayout
         android:layout_width="match_parent"
@@ -21,7 +37,6 @@
             android:layout_height="wrap_content"
             android:text="Enter Your Phone Number"
             android:gravity="center"
-            android:layout_marginTop="100dp"
             android:textSize="20sp"
             android:textColor="#000000"/>
 
@@ -29,8 +44,8 @@
             android:id="@+id/editText"
             android:layout_width="match_parent"
             android:layout_height="wrap_content"
-            android:layout_marginBottom="40dp"
-            android:layout_marginTop="20dp"
+            android:layout_marginBottom="20dp"
+            android:layout_marginTop="10dp"
             android:background="@drawable/boxy"
             android:ems="10"
             android:gravity="center"
@@ -58,8 +73,8 @@
             android:background="@drawable/boxy"
             android:inputType="textPersonName"
             android:textSize="24sp"
-            android:layout_marginBottom="40dp"
-            android:layout_marginTop="20dp"
+            android:layout_marginBottom="30dp"
+            android:layout_marginTop="10dp"
             android:paddingTop="4dp"
             android:paddingBottom="4dp"
             android:hint="\@heribberto"/>
@@ -89,7 +104,7 @@
                     android:background="@drawable/buttonbox"
                     android:textAllCaps="false"/>
             </LinearLayout>
-
+        </LinearLayout>
         </LinearLayout>
     </LinearLayout>
 </LinearLayout>
