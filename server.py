@@ -52,7 +52,7 @@ def getUsersJson():
     return json.loads(urlopen('https://s3.amazonaws.com/twinty/users.json').read().decode())
 
 
-def listen(auth, stream, userIDs, api):
+def listen(auth, userIDs, api):
     try:
         stream = tweepy.Stream(auth, TweetListener())
         stream.filter(follow = userIDs, async = True)
@@ -87,7 +87,7 @@ if __name__ == '__main__':
     conn = boto.connect_s3(authInfo['aws_access_key'], authInfo['aws_secret_key'])
     bucket = conn.get_bucket('twinty')
 
-    listen(auth, stream, userIDs, api)
+    listen(auth, userIDs, api)
     # stream = tweepy.Stream(auth, TweetListener())
     # stream.filter(follow = userIDs, async = True)
 
