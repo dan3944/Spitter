@@ -11,7 +11,7 @@ application = Flask(__name__)
 
 @application.route('/test', methods=['GET', 'POST'])
 def test():
-    return 'asdf'
+    return 'test'
 
 
 @application.route('/receive_text', methods=['GET', 'POST'])
@@ -68,12 +68,12 @@ def handleExists(handle):
         return False
 
 def downloadUsersJson():
-    return json.loads(urlopen('https://s3.amazonaws.com/twinty/users.json').read())
+    return json.loads(urlopen('https://s3.amazonaws.com/twinty/users.json').read().decode())
 
 def uploadUsersJson(jsonDict):
     conn = boto.connect_s3('AKIAIWSDS2KRBFRPN2RA', 'ZBoOGV/P2pRvmm8d6WzbFgRCjDTP0F6NFhAJf+cV')
     bucket = conn.get_bucket('twinty')
-    
+
     tmp = json.dumps(jsonDict)
     kOld = Key(bucket)
     kNew = Key(bucket)
