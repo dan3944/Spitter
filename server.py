@@ -2,6 +2,7 @@ from textblob import TextBlob as tb
 from tweepy.streaming import StreamListener
 from twilio.rest import Client
 from urllib.request import urlopen
+from datetime import datetime
 from boto.s3.key import Key
 import boto.s3
 import tweepy
@@ -20,23 +21,28 @@ xmlTemplate = '''
 class TweetListener(StreamListener):
     bucket = None
     client = None
+    usersJson = None
+    lastUpdatedUsers = 0
 
     def __init__(self, bucket, client):
         self.bucket = bucket
         self.client = client
-
+        self.usersJson = getUsersJson()
+        self.lastUpdatedUsers = time.time()
 
     def on_data(self, data):
         data = json.loads(data)
-        handleToNumbers = getUsersJson()
+
+        if time.time() - self.lastUpdatedUsers > 5:
+            self.usersJson = getUsersJson()
 
         if 'user' not in data:
             return
 
         data['user']['screen_name'] = data['user']['screen_name'].upper()
 
-        if data['user']['screen_name'] in handleToNumbers.keys():
-            phonesToCall = handleToNumbers[data['user']['screen_name']]
+        if data['user']['screen_name'] in self.usersJson.keys():
+            phonesToCall = self.usersJson[data['user']['screen_name']]
 
             # detect emotion
             blob = tb(data['text'])
@@ -96,6 +102,7 @@ if __name__ == '__main__':
         time.sleep(5)
         newUserIDs = set(str(api.get_user(handle).id) for handle in getUsersJson().keys())
 
+        # if someone has followed someone new who no one has followed before
         if newUserIDs != userIDs:
             userIDs = newUserIDs
             process.terminate()
