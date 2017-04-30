@@ -18,6 +18,14 @@ xmlTemplate = '''
 '''
 
 class TweetListener(StreamListener):
+    bucket = None
+    client = None
+
+    def __init__(self, bucket, client):
+        self.bucket = bucket
+        self.client = client
+
+
     def on_data(self, data):
         data = json.loads(data)
         handleToNumbers = getUsersJson()
@@ -38,30 +46,30 @@ class TweetListener(StreamListener):
             for phoneNum in phonesToCall:
                 call(phoneNum, data, voice)
 
-def call(phoneTo, tweet, voice):
-    xml = xmlTemplate % (voice, tweet['user']['name'], tweet['text'])
-    print(xml)
-    k = Key(bucket)
-    k.key = 'tweet_%s.xml' % tweet['id']
-    k.content_type = 'text/xml'
-    k.set_contents_from_string(xml)
-    k.set_acl('public-read')
-    client.calls.create(to=phoneTo, from_=phoneFrom, method='GET',
-            url='https://s3.amazonaws.com/twinty/tweet_%s.xml' % tweet['id'])
+    def call(self, phoneTo, tweet, voice):
+        xml = xmlTemplate % (voice, tweet['user']['name'], tweet['text'])
+        print(xml)
+        k = Key(self.bucket)
+        k.key = 'tweet_%s.xml' % tweet['id']
+        k.content_type = 'text/xml'
+        k.set_contents_from_string(xml)
+        k.set_acl('public-read')
+        self.client.calls.create(to=phoneTo, from_=phoneFrom, method='GET',
+                url='https://s3.amazonaws.com/twinty/tweet_%s.xml' % tweet['id'])
 
 def getUsersJson():
     return json.loads(urlopen('https://s3.amazonaws.com/twinty/users.json').read().decode())
 
 
-def listenWithExceptionHandler(auth, userIDs):
+def listenWithExceptionHandler(auth, userIDs, bucket, client):
     print("Starting Twitter listener.")
     try:
-        tweepy.Stream(auth, TweetListener()).filter(follow = userIDs)
+        tweepy.Stream(auth, TweetListener(bucket, client)).filter(follow = userIDs)
     except KeyboardInterrupt:
         return
     except Exception as e:
         print(str(e))
-        listenWithExceptionHandler(auth, userIDs, api)
+        listenWithExceptionHandler(auth, userIDs, api, bucket, client)
 
 
 if __name__ == '__main__':
@@ -81,7 +89,7 @@ if __name__ == '__main__':
     conn = boto.connect_s3(authInfo['aws_access_key'], authInfo['aws_secret_key'])
     bucket = conn.get_bucket('twinty')
 
-    process = multiprocessing.Process(target=listenWithExceptionHandler, args=(auth, userIDs))
+    process = multiprocessing.Process(target=listenWithExceptionHandler, args=(auth, userIDs, bucket, client))
     process.start()
 
     while True:
@@ -91,5 +99,5 @@ if __name__ == '__main__':
         if newUserIDs != userIDs:
             userIDs = newUserIDs
             process.terminate()
-            process = multiprocessing.Process(target=listenWithExceptionHandler, args=(auth, userIDs))
+            process = multiprocessing.Process(target=listenWithExceptionHandler, args=(auth, userIDs, bucket, client))
             process.start()
