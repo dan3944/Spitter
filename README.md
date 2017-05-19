@@ -8,3 +8,6 @@ To follow someone, text "Follow twitter_handle" (without the quotes) to 617-858-
 
 To unfollow someone, text "Unfollow twitter_handle" (without the quotes) to 617-858-8543. For example, "Unfollow realDonaldTrump".
 Note: this is (temporarily?) down until I get more Amazon S3 credits.
+
+
+This was created at HackBoston 2017.
