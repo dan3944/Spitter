@@ -1,13 +1,12 @@
-from flask import Flask, request
-from twilio.rest import Client
 from twilio.twiml.messaging_response import MessagingResponse
 from urllib.request import urlopen
 from boto.s3.key import Key
 import boto.s3
 import json
 import tweepy
+import flask
 
-application = Flask(__name__)
+application = flask.Flask(__name__)
 
 @application.route('/test', methods=['GET', 'POST'])
 def test():
@@ -17,8 +16,8 @@ def test():
 @application.route('/receive_text', methods=['GET', 'POST'])
 def receiveText():
     try:
-        fromNumber = request.values.get('From')
-        msgText = request.values.get('Body')
+        fromNumber = flask.request.values.get('From')
+        msgText = flask.request.values.get('Body')
 
         if fromNumber is None or msgText is None:
             return str(MessagingResponse().message('Error: Malformed message.'))
@@ -34,7 +33,7 @@ def receiveText():
 
         if action not in ('FOLLOW', 'UNFOLLOW'):
             return str(MessagingResponse().message(
-                'Your action must be either "Follow" or "Unfollow". Your action was "%s".' % action))
+                'Your action must be either "FOLLOW" or "UNFOLLOW". Your action was "%s".' % action))
         elif not handleExists(handle):
             return str(MessagingResponse().message('Could not find the twitter handle "%s"' % handle))
 
@@ -61,6 +60,7 @@ def handleExists(handle):
     with open('auth.json') as f:
         authInfo = json.loads(f.read())
 
+    # TODO: make global for efficiency
     auth = tweepy.OAuthHandler(authInfo['twitter_api_key'], authInfo['twitter_api_secret'])
     auth.set_access_token(authInfo['twiter_access_token'], authInfo['twitter_access_secret'])
     api = tweepy.API(auth)
@@ -75,8 +75,8 @@ def downloadUsersJson():
     return json.loads(urlopen('https://s3.amazonaws.com/twinty/users.json').read().decode())
 
 def uploadUsersJson(jsonDict):
-    bucket = boto.connect_s3('<redacted>', '<redacted>') \
-                    .get_bucket('twinty')
+    # TODO: make global for efficiency and add authInfo json
+    bucket = boto.connect_s3('<redacted>', '<redacted>').get_bucket('twinty')
 
     tmp = json.dumps(jsonDict)
     kOld = Key(bucket)
@@ -90,14 +90,5 @@ def uploadUsersJson(jsonDict):
 
 
 if __name__ == '__main__':
-    # with open('auth.json') as f:
-    #     authInfo = json.loads(f.read())
-    
-    # client = Client(authInfo['twilio_acct_sid'], authInfo['twilio_auth_token'])
-    client = Client('<redacted>', '<redacted>')
-
-    # aws info
-    # conn = boto.connect_s3(authInfo['aws_access_key'], authInfo['aws_secret_key'])
-
     application.debug = True
     application.run()

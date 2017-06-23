@@ -31,11 +31,11 @@ class TweetListener(StreamListener):
     def on_data(self, data):
         data = json.loads(data)
 
-        if time.time() - self.lastUpdatedUsers > 5:
-            self.usersJson = getUsersJson()
-
         if 'user' not in data:
             return
+
+        if time.time() - self.lastUpdatedUsers > 5:
+            self.usersJson = getUsersJson()
 
         data['user']['screen_name'] = data['user']['screen_name'].upper()
 
