@@ -139,7 +139,7 @@ public class MainActivity extends AppCompatActivity implements View.OnClickListe
 
 
 //                        String accessKey = "AKIAJE253PUSJXRAJC2Q";
-//                        String secretKey = "IpfaDuGs+R7qztA7/HvLiFRfTsNdtQQGB4WhdtEN";
+//                        String secretKey = "<redacted>";
 //
 //                        Log.d("MYAPP", "In Amazon area");
 //                        AWSCredentials credentials = new BasicAWSCredentials(accessKey, secretKey);
