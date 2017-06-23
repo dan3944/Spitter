@@ -10,5 +10,7 @@ To unfollow someone, text "Unfollow twitter_handle" (without the quotes) to 617-
 
 Note: this is (temporarily?) down until I get more Amazon S3 credits.
 
+The source code is in server.py and eb/application.py.
+A (not quite complete) Android app is in the Twinty/ directory.
 
 This was created at HackBoston 2017.
